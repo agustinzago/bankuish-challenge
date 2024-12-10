@@ -1,0 +1,37 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id                  String         @id @default(cuid())
+  title               String         @unique
+  description         String
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  prerequisites       Prerequisite[] @relation("PrerequisiteCourses")
+  prerequisiteCourses Prerequisite[] @relation("CoursePrerequisites")
+}
+
+model Prerequisite {
+  id             String @id @default(cuid())
+  courseId       String
+  prerequisiteId String
+
+  course       Course @relation("CoursePrerequisites", fields: [courseId], references: [id])
+  prerequisite Course @relation("PrerequisiteCourses", fields: [prerequisiteId], references: [id])
+}
